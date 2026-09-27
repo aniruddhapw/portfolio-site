@@ -193,9 +193,10 @@ main, footer { position: relative; z-index: 2; }
   letter-spacing: -.08em; color: transparent; -webkit-text-stroke: 1px color-mix(in srgb, var(--text) 9%, transparent);
   pointer-events: none; user-select: none; z-index: -1; }
 
-.split-line { display: block; overflow: hidden; padding-bottom: .08em; margin-bottom: -.08em; }
+/* masks for the slide-up reveals: tall enough for italic descenders (y, g, p) */
+.split-line { display: block; overflow: hidden; padding-bottom: .24em; margin-bottom: -.24em; }
 .split-line > span { display: inline-block; }
-.word { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .1em; margin-bottom: -.1em; }
+.word { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .24em; margin-bottom: -.24em; }
 .word > span { display: inline-block; will-change: transform; }
 
 /* ---------- Hero ---------- */
@@ -208,7 +209,9 @@ main, footer { position: relative; z-index: 2; }
 .hero__title { font-size: clamp(46px, 7.6vw, 124px); line-height: .92; letter-spacing: -.055em; font-weight: 500; margin: 28px 0 28px; }
 .hero__title .serif { font-size: 1.08em; letter-spacing: -.03em;
   background: linear-gradient(100deg, var(--accent-soft), var(--teal) 40%, var(--rose) 70%, var(--accent-soft));
-  background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: sheen 8s linear infinite; padding-right: .08em; }
+  background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: sheen 8s linear infinite;
+  /* background-clip:text only paints inside the box, so extend it under the descenders */
+  padding: 0 .08em .2em 0; margin-bottom: -.2em; }
 @keyframes sheen { to { background-position: -250% 0; } }
 .hero__lede { max-width: 540px; font-size: clamp(16px, 1.3vw, 18px); color: color-mix(in srgb, var(--text) 78%, transparent); margin: 0 0 26px; }
 .hero__lede strong { color: var(--text); font-weight: 500; }

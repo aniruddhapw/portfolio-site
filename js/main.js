@@ -350,7 +350,7 @@ function setupScrollFX() {
   $$('[data-split]').forEach((h) => {
     const words = splitWords(h);
     gsap.from(words, {
-      yPercent: 115, rotate: 5, duration: 1.2, stagger: 0.07, ease: 'expo.out',
+      yPercent: 140, rotate: 5, duration: 1.2, stagger: 0.07, ease: 'expo.out',
       scrollTrigger: { trigger: h, start: 'top 88%' },
     });
   });
@@ -1350,7 +1350,7 @@ function heroIntroSetup() {
   if (!hasGSAP || reduced) return null;
   const lines = $$('.hero__title .split-line > span');
   const intros = $$('[data-intro]');
-  gsap.set(lines, { yPercent: 115 });
+  gsap.set(lines, { yPercent: 140 });
   gsap.set(intros, { y: 30, opacity: 0 });
   gsap.set('.hero__drag, .scroll-cue', { opacity: 0 });
   return () => {
