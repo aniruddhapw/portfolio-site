@@ -213,13 +213,17 @@ $$('[data-copy]').forEach((btn) => btn.addEventListener('click', async () => {
     scrollToTarget(hash);
   });
 
+  // Highlight whichever nav section spans the middle of the viewport (none over the hero/band)
   const links = $$('.nav__links a');
-  const secIO = new IntersectionObserver((entries) => {
-    for (const e of entries) if (e.isIntersecting) {
-      links.forEach((l) => l.classList.toggle('is-active', l.getAttribute('href') === '#' + e.target.id));
-    }
-  }, { rootMargin: '-45% 0px -50% 0px' });
-  ['work', 'case', 'stack', 'path', 'writing', 'lab'].forEach((id) => { const s = document.getElementById(id); if (s) secIO.observe(s); });
+  const secs = links.map((l) => document.getElementById(l.getAttribute('href').slice(1))).filter(Boolean);
+  let lastCheck = -1;
+  addLoop(() => {
+    if (Math.abs(state.scrollY - lastCheck) < 8) return;
+    lastCheck = state.scrollY;
+    const mid = innerHeight * 0.45;
+    const cur = secs.find((sec) => { const r = sec.getBoundingClientRect(); return r.top <= mid && r.bottom > mid; });
+    links.forEach((l) => l.classList.toggle('is-active', !!cur && l.getAttribute('href') === '#' + cur.id));
+  });
 })();
 
 /* progress bar + fixed aura parallax */
@@ -724,6 +728,7 @@ async function initGL() {
     updateTags.hidden = false;
     const sr = stage.getBoundingClientRect();
     const s = core.scale.x;
+    const fade = clamp((sr.bottom - 80) / (sr.height * 0.6), 0, 1); // dissolve with the hero copy
     for (let i = 0; i < N; i++) {
       v3.copy(tagPts[i]).applyQuaternion(quat);
       const depth = v3.z / R; // -1 back … 1 front
@@ -734,7 +739,7 @@ async function initGL() {
       const sc = 0.72 + t * 0.4;
       const el = tagEls[i];
       el.style.transform = `translate3d(${x - tagSizes[i][0] / 2}px, ${y - tagSizes[i][1] / 2}px, 0) scale(${sc})`;
-      el.style.opacity = ((0.12 + t * t * 0.88) * intro.tags).toFixed(3);
+      el.style.opacity = ((0.12 + t * t * 0.88) * intro.tags * fade).toFixed(3);
       el.style.zIndex = Math.round(t * 100);
     }
   }
@@ -860,6 +865,91 @@ function setupWorkPin() {
   const fx = observe(el, {});
   setInterval(() => { if (fx.visible || exploded) { exploded = !exploded; apply(); } }, 2600);
   el.parentElement.addEventListener('pointerenter', () => { exploded = true; apply(); });
+})();
+
+(function attributionDash() {
+  const canvas = $('canvas[data-fx="dash"]');
+  if (!canvas) return;
+  const box = canvas.closest('.dash');
+  const fx = observe(box, {});
+  const N = 8, months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'];
+  const spend = Array.from({ length: N }, (_, i) => 32 + i * 5 + Math.random() * 8);
+  const leads = spend.map((v) => v * 0.85 + 6 + Math.random() * 10);
+  const shown = { s: spend.map(() => 0), l: leads.map(() => 0) };
+  const kpiEls = Object.fromEntries($$('[data-kpi]', box).map((el) => [el.dataset.kpi, el]));
+  const funnelBars = $$('.funnel__row i', box), funnelNums = $$('.funnel__row b', box);
+  const kpi = { spend: 0, leads: 0, deals: 0, roas: 0 };
+  const target = { ...kpi };
+  let rates = [1, 0.66, 0.36, 0.17];
+  const retarget = () => {
+    target.spend = spend.reduce((a, b) => a + b, 0) * 0.13;
+    target.leads = leads.reduce((a, b) => a + b, 0) * 2.4;
+    target.deals = target.leads * rates[3];
+    target.roas = 3.2 + (rates[3] - 0.14) * 18;
+    rates.forEach((r, i) => { funnelBars[i].style.setProperty('--w', `${r * 100}%`); funnelNums[i].textContent = Math.round(target.leads * r).toLocaleString('en-US'); });
+  };
+  retarget();
+  let ctx, W, H, t = 0, next = 2.5, grow = 0;
+  new ResizeObserver(() => { ({ ctx, w: W, h: H } = fitCanvas(canvas)); }).observe(canvas);
+  const ease = (x) => 1 - (1 - x) ** 3;
+  addLoop((dt) => {
+    if (!fx.visible || !ctx) return;
+    t += dt; grow = Math.min(1, grow + dt * 0.7);
+    if (t > next) { // new data lands: nudge a couple of months and the funnel
+      next = t + 2.4;
+      for (let k = 0; k < 2; k++) { const i = (Math.random() * N) | 0; spend[i] = clamp(spend[i] + (Math.random() - 0.45) * 14, 20, 90); leads[i] = clamp(spend[i] * (0.75 + Math.random() * 0.35) + 4, 16, 98); }
+      rates = [1, 0.6 + Math.random() * 0.12, 0.3 + Math.random() * 0.1, 0.14 + Math.random() * 0.06];
+      retarget();
+    }
+    for (const k in kpi) kpi[k] = lerp(kpi[k], target[k] * ease(grow), 0.08);
+    kpiEls.spend.textContent = `${kpi.spend.toFixed(1)}K`;
+    kpiEls.leads.textContent = Math.round(kpi.leads).toLocaleString('en-US');
+    kpiEls.deals.textContent = Math.round(kpi.deals).toLocaleString('en-US');
+    kpiEls.roas.textContent = `${kpi.roas.toFixed(1)}×`;
+
+    const padL = 10, padR = 10, padT = 14, padB = 20, cw = W - padL - padR, chh = H - padT - padB, step = cw / N;
+    ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(233,233,237,0.06)'; ctx.lineWidth = 1;
+    for (let g = 1; g <= 3; g++) { const y = padT + (chh * g) / 4; ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke(); }
+    const pts = [];
+    for (let i = 0; i < N; i++) {
+      shown.s[i] = lerp(shown.s[i], spend[i] * ease(grow), 0.08);
+      shown.l[i] = lerp(shown.l[i], leads[i] * ease(grow), 0.08);
+      const bw = step * 0.46, x = padL + step * i + (step - bw) / 2, bh = (shown.s[i] / 100) * chh;
+      ctx.fillStyle = rgba(state.accent, 0.55);
+      ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, padT + chh - bh, bw, bh, [4, 4, 0, 0]) : ctx.rect(x, padT + chh - bh, bw, bh); ctx.fill();
+      pts.push([padL + step * i + step / 2, padT + chh - (shown.l[i] / 100) * chh]);
+      ctx.fillStyle = 'rgba(147,151,171,0.8)'; ctx.font = '9px JetBrains Mono, monospace'; ctx.textAlign = 'center';
+      ctx.fillText(months[i], padL + step * i + step / 2, H - 6);
+    }
+    const area = ctx.createLinearGradient(0, padT, 0, padT + chh);
+    area.addColorStop(0, 'rgba(127,209,193,0.35)'); area.addColorStop(1, 'rgba(127,209,193,0)');
+    ctx.beginPath(); ctx.moveTo(pts[0][0], padT + chh);
+    pts.forEach(([x, y]) => ctx.lineTo(x, y));
+    ctx.lineTo(pts[N - 1][0], padT + chh); ctx.closePath(); ctx.fillStyle = area; ctx.fill();
+    ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+    ctx.strokeStyle = '#7fd1c1'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = '#e9e9ed';
+    pts.forEach(([x, y]) => { ctx.beginPath(); ctx.arc(x, y, 2.4, 0, TAU); ctx.fill(); });
+  });
+})();
+
+(function microFrontends() {
+  const el = $('#mfe');
+  if (!el) return;
+  const badges = $$('.mfe__mod em', el);
+  const fx = observe(el, {});
+  let split = false;
+  setInterval(() => { if (fx.visible || split) { split = !split; el.classList.toggle('is-split', split); } }, 2800);
+  // each module ships on its own clock — that's the point of micro-frontends
+  setInterval(() => {
+    if (!fx.visible) return;
+    const b = badges[(Math.random() * badges.length) | 0];
+    if (b.classList.contains('is-deploying')) return;
+    const [maj, min, patch] = b.textContent.replace(/[^\d.]/g, '').split('.').map(Number);
+    b.classList.add('is-deploying'); b.textContent = 'deploying…';
+    setTimeout(() => { b.classList.remove('is-deploying'); b.textContent = `v${maj}.${min}.${patch + 1} ✓`; }, 1400);
+  }, 1700);
 })();
 
 (function paint() {

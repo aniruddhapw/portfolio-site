@@ -58,7 +58,7 @@
       <a href="#top" class="logo magnetic" data-cursor><span class="logo__mark">AW</span><span>aniruddha<b>.dev</b></span></a>
       <nav class="nav__links" aria-label="Primary">
         <a href="#work">Work</a>
-        <a href="#case">Case study</a>
+        <a href="#case">Case studies</a>
         <a href="#stack">Stack</a>
         <a href="#path">Path</a>
         <a href="#writing">Writing</a>
@@ -70,7 +70,7 @@
   </header>
   <div class="mobile-menu" id="mobileMenu" inert>
     <a href="#work"><small>01</small>Work</a>
-    <a href="#case"><small>02</small>Case study</a>
+    <a href="#case"><small>02</small>Case studies</a>
     <a href="#stack"><small>03</small>Stack</a>
     <a href="#path"><small>04</small>Path</a>
     <a href="#writing"><small>05</small>Writing</a>
@@ -89,7 +89,7 @@
             <span class="split-line"><span>Then make it</span></span>
             <span class="split-line"><span class="serif">absurdly fast.</span></span>
           </h1>
-          <p class="hero__lede" data-intro>I'm <strong>Aniruddha</strong> — a frontend &amp; full-stack developer with 3+ years at Contentstack and Reckonsys. I rebuilt a legacy Next.js site into App Router and dragged Lighthouse from the fifties into the nineties. Then I shipped a page builder so the content team would stop needing me.</p>
+          <p class="hero__lede" data-intro>I'm <strong>Aniruddha</strong> — a frontend &amp; full-stack developer with 3+ years at Contentstack and Reckonsys. I built a marketing-attribution product from an empty repo, shipped modules on a micro-frontend learning platform, then rebuilt a legacy Next.js site into App Router and dragged Lighthouse from the fifties into the nineties.</p>
           <div class="hero__chips" data-intro>
             <span class="chip">Next.js</span><span class="chip">TypeScript</span><span class="chip">React</span><span class="chip">Node</span><span class="chip">Tailwind</span><span class="chip">WebSockets</span>
           </div>
@@ -120,7 +120,7 @@
       <div class="stats">
         <div class="stat"><div class="stat__value"><span data-count-from="50" data-count="95">50→95</span></div><span class="mono">Lighthouse, across pages</span></div>
         <div class="stat"><div class="stat__value"><span data-count="3">3</span><em>+</em></div><span class="mono">Years in production</span></div>
-        <div class="stat"><div class="stat__value"><span data-count="4">4</span> <em>mo</em></div><span class="mono">Pages → App Router rebuild</span></div>
+        <div class="stat"><div class="stat__value">0<em>→</em>1</div><span class="mono">Analytics product, built solo</span></div>
         <div class="stat"><div class="stat__value"><em>₹</em><span data-count="50">50</span>K</div><span class="mono">Hackathon, 2nd runner-up</span></div>
       </div>
       <div class="marquee" aria-hidden="true">
@@ -136,21 +136,101 @@
       <span class="section__num" data-parallax="0.25" aria-hidden="true">01</span>
       <div class="wrap section__head">
         <h2 class="section__title" data-split>Selected <span class="serif">work</span></h2>
-        <span class="mono">03 things I'm proud of — scroll sideways</span>
+        <span class="mono">05 things I'm proud of — scroll sideways</span>
       </div>
       <div class="work__pin" id="workPin">
         <div class="work__track" id="workTrack">
+          <!-- Reckonsys client work: client names intentionally omitted. -->
+          <article class="project tilt" data-cursor-label="view">
+            <div class="project__visual">
+              <div class="dash" aria-label="Animated mock of a lead-to-sale attribution dashboard">
+                <div class="dash__top"><span class="dash__title">Lead → Sale</span><span class="dash__live">● LIVE · DEMO DATA</span></div>
+                <div class="dash__kpis">
+                  <div><span class="mono">Spend</span><b data-kpi="spend">0</b></div>
+                  <div><span class="mono">Leads</span><b data-kpi="leads">0</b></div>
+                  <div><span class="mono">Deals</span><b data-kpi="deals">0</b></div>
+                  <div><span class="mono">ROAS</span><b data-kpi="roas">0</b></div>
+                </div>
+                <div class="dash__body">
+                  <div class="dash__chart"><canvas data-fx="dash"></canvas></div>
+                  <div class="funnel">
+                    <div class="funnel__row"><span>Lead</span><i style="--w:100%"></i><b data-f="0">—</b></div>
+                    <div class="funnel__row"><span>Contacted</span><i style="--w:66%"></i><b data-f="1">—</b></div>
+                    <div class="funnel__row"><span>Appointment</span><i style="--w:36%"></i><b data-f="2">—</b></div>
+                    <div class="funnel__row"><span>Deal</span><i style="--w:17%"></i><b data-f="3">—</b></div>
+                  </div>
+                </div>
+                <div class="dash__sources"><span>Meta Ads</span><span>Google Ads</span><span>CRM · JSON events</span></div>
+              </div>
+            </div>
+            <div class="project__body">
+              <span class="mono">01 · Reckonsys client · Built solo</span>
+              <h3>Lead-to-sale attribution platform</h3>
+              <p>A marketing-analytics product that answers the question ad dashboards dodge: which spend actually turned into revenue. I built the whole app from an empty repo — funnels, CRM and ad-source connections, and the dashboards on top.</p>
+              <div class="project__tags"><span class="chip">React</span><span class="chip">TypeScript</span><span class="chip">Recharts</span><span class="chip">Ad-platform APIs</span></div>
+              <a href="#case2" class="project__link">Read the case study →</a>
+            </div>
+            <span class="project__index" aria-hidden="true">01</span>
+            <div class="glare"></div>
+          </article>
+
+
+          <article class="project tilt" data-cursor-label="view">
+            <div class="project__visual">
+              <div class="builder" id="builder" aria-label="Exploded 3D view of page-builder components">
+                <div class="builder__stack">
+                  <div class="builder__layer" style="grid-template-rows:1fr"><b class="r"></b><span>&lt;Footer /&gt;</span></div>
+                  <div class="builder__layer" style="grid-template-columns:1fr 1fr 1fr"><b></b><b class="t"></b><b></b><span>&lt;FeatureGrid /&gt;</span></div>
+                  <div class="builder__layer" style="grid-template-columns:1.4fr 1fr"><b class="t"></b><b></b><span>&lt;Hero /&gt;</span></div>
+                  <div class="builder__layer" style="grid-template-rows:1fr 5fr"><b></b><i></i><span>&lt;Nav /&gt;</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="project__body">
+              <span class="mono">02 · Contentstack · Production</span>
+              <h3>CMS-driven page builder</h3>
+              <p>A modular component system that let content teams ship pages without a developer in the loop — and cut routine update tickets to roughly nothing.</p>
+              <div class="project__tags"><span class="chip">Next.js</span><span class="chip">TypeScript</span><span class="chip">Tailwind</span></div>
+              <a href="#case" class="project__link">Read the case study →</a>
+            </div>
+            <span class="project__index" aria-hidden="true">02</span>
+            <div class="glare"></div>
+          </article>
+          <article class="project tilt" data-cursor-label="view">
+            <div class="project__visual">
+              <div class="mfe" id="mfe" aria-label="Animated diagram of micro-frontend modules docking into a host shell">
+                <div class="mfe__shell">
+                  <div class="mfe__bar"><i></i><i></i><i></i><span>host shell</span></div>
+                  <div class="mfe__side"><b></b><b></b><b></b><b></b><b></b></div>
+                  <div class="mfe__grid">
+                    <div class="mfe__mod"><span>@app/classroom</span><em>v2.4.1 ✓</em><div class="mfe__ui"><i></i><i></i><i></i></div></div>
+                    <div class="mfe__mod"><span>@app/lessons</span><em>v3.0.2 ✓</em><div class="mfe__ui mfe__ui--cards"><i></i><i></i><i></i><i></i></div></div>
+                    <div class="mfe__mod"><span>@app/progress</span><em>v1.9.0 ✓</em><div class="mfe__ring"></div></div>
+                    <div class="mfe__mod"><span>@app/assignments</span><em>v2.1.7 ✓</em><div class="mfe__ui"><i></i><i></i></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="project__body">
+              <span class="mono">03 · Reckonsys client · Team</span>
+              <h3>Student learning platform</h3>
+              <p>React + TypeScript features for a student learning platform built on a micro-frontend architecture — each module lives, builds and ships on its own, next to other teams' code, without stepping on it.</p>
+              <div class="project__tags"><span class="chip">React</span><span class="chip">TypeScript</span><span class="chip">Micro-frontends</span></div>
+            </div>
+            <span class="project__index" aria-hidden="true">03</span>
+            <div class="glare"></div>
+          </article>
+
 
           <article class="project tilt" data-cursor-label="view">
             <div class="project__visual"><canvas data-fx="paint" aria-label="Generative painting in the Artasin palette"></canvas></div>
             <div class="project__body">
-              <span class="mono">01 · Marketplace · In progress</span>
+              <span class="mono">04 · Marketplace · In progress</span>
               <h3>Artasin</h3>
               <p>A place for artists to sell originals without needing an MFA in checkout flows. Next.js App Router, Stripe, and an image pipeline that doesn't cry at 40-megapixel scans.</p>
               <div class="project__tags"><span class="chip">Next.js</span><span class="chip">TypeScript</span><span class="chip">Stripe</span><span class="chip">Image CDN</span></div>
-              <a href="#case" class="project__link">Read the case study →</a>
             </div>
-            <span class="project__index" aria-hidden="true">01</span>
+            <span class="project__index" aria-hidden="true">04</span>
             <div class="glare"></div>
           </article>
 
@@ -176,34 +256,12 @@
               </div>
             </div>
             <div class="project__body">
-              <span class="mono">02 · Realtime · Capstone</span>
+              <span class="mono">05 · Realtime · Capstone</span>
               <h3>Slack, but mine</h3>
               <p>Full-stack chat on React + Node with WebSockets doing the live-messaging heavy lifting. Channels, presence, typing indicators — and zero polling anywhere in it.</p>
               <div class="project__tags"><span class="chip">React</span><span class="chip">Node</span><span class="chip">WebSockets</span><span class="chip">MongoDB</span></div>
             </div>
-            <span class="project__index" aria-hidden="true">02</span>
-            <div class="glare"></div>
-          </article>
-
-          <article class="project tilt" data-cursor-label="view">
-            <div class="project__visual">
-              <div class="builder" id="builder" aria-label="Exploded 3D view of page-builder components">
-                <div class="builder__stack">
-                  <div class="builder__layer" style="grid-template-rows:1fr"><b class="r"></b><span>&lt;Footer /&gt;</span></div>
-                  <div class="builder__layer" style="grid-template-columns:1fr 1fr 1fr"><b></b><b class="t"></b><b></b><span>&lt;FeatureGrid /&gt;</span></div>
-                  <div class="builder__layer" style="grid-template-columns:1.4fr 1fr"><b class="t"></b><b></b><span>&lt;Hero /&gt;</span></div>
-                  <div class="builder__layer" style="grid-template-rows:1fr 5fr"><b></b><i></i><span>&lt;Nav /&gt;</span></div>
-                </div>
-              </div>
-            </div>
-            <div class="project__body">
-              <span class="mono">03 · Contentstack · Production</span>
-              <h3>CMS-driven page builder</h3>
-              <p>A modular component system that let content teams ship pages without a developer in the loop — and cut routine update tickets to roughly nothing.</p>
-              <div class="project__tags"><span class="chip">Next.js</span><span class="chip">TypeScript</span><span class="chip">Tailwind</span></div>
-              <a href="#case" class="project__link">How it was built →</a>
-            </div>
-            <span class="project__index" aria-hidden="true">03</span>
+            <span class="project__index" aria-hidden="true">05</span>
             <div class="glare"></div>
           </article>
 
@@ -225,8 +283,8 @@
       <span class="section__num" data-parallax="0.25" aria-hidden="true">02</span>
       <div class="wrap">
         <div class="section__head">
-          <h2 class="section__title" data-split>Case <span class="serif">study</span></h2>
-          <span class="mono">Contentstack · App Router rebuild</span>
+          <h2 class="section__title" data-split>Case <span class="serif">studies</span></h2>
+          <span class="mono">01 · Contentstack · App Router rebuild</span>
         </div>
         <div class="case__intro">
           <div data-reveal>
@@ -287,6 +345,31 @@
             <span class="compare__label compare__label--r">AFTER</span>
             <div class="compare__handle"><button type="button" aria-label="Drag to compare before and after" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">⟷</button></div>
           </div>
+        
+      </div>
+        <div class="case2" id="case2">
+          <div class="case2__head">
+            <span class="mono">02 · Reckonsys client work · Solo build</span>
+            <h3 class="case2__title">A marketing-attribution platform, <span class="serif">from an empty repo</span></h3>
+          </div>
+          <div class="case__intro">
+            <div data-reveal>
+              <p>A client needed to prove which ad spend actually turned into revenue — not clicks, not "engagement", closed deals. Leads lived in a CRM, spend lived in the ad platforms, and nobody could join the two. I built the whole app from scratch, on my own.</p>
+              <div class="role"><span class="mono" style="font-size:10.5px">My role</span><b>Sole developer</b><span class="mono" style="font-size:10.5px">at Reckonsys</span></div>
+            </div>
+            <ul class="owned" data-reveal>
+              <li>Configurable funnels — lead → contacted → appointment → deal</li>
+              <li>CRM ingestion from a simple JSON event per stage</li>
+              <li>Native paid-source connections for spend and campaign metrics</li>
+              <li>Matching server-side events back to the spend behind them</li>
+              <li>Funnel, revenue and campaign-performance dashboards in React + Recharts</li>
+            </ul>
+          </div>
+          <div class="pillars">
+            <div class="pillar tilt" data-parallax-local="-0.06"><div class="pillar__n">01</div><span class="mono">The problem</span><p>Ad platforms grade themselves on engagement. The business needed revenue per source — and a way to settle the sales-vs-marketing argument with data.</p><div class="glare"></div></div>
+            <div class="pillar tilt" data-parallax-local="0.04"><div class="pillar__n">02</div><span class="mono">The build</span><p>Every layer, from the first commit: the funnel model, CRM and ad-source ingestion, attribution matching, and the product UI on top.</p><div class="glare"></div></div>
+            <div class="pillar tilt" data-parallax-local="-0.1"><div class="pillar__n">03</div><span class="mono">The dashboards</span><p>Spend against leads against approvals, true revenue per lead source, goals per channel, and team views sales managers actually open.</p><div class="glare"></div></div>
+          </div>
         </div>
       </div>
     </section>
@@ -335,7 +418,7 @@
           <div class="timeline__rail"><div class="timeline__fill" id="tlFill"></div></div>
           <div class="timeline__head" id="tlHead" aria-hidden="true"></div>
           <div class="tl-item"><div class="tl-card tilt"><span class="mono">May 2025 — Aug 2026 · Contentstack</span><h3>Software Developer</h3><p>Led frontend modernization of two production apps: the App Router rebuild, the CMS-driven page builder, pre-commit ESLint and build validation, and the Lighthouse climb from the fifties to the nineties.</p><div class="glare"></div></div></div>
-          <div class="tl-item"><div class="tl-card tilt"><span class="mono">Jul 2023 — Apr 2025 · Reckonsys Tech Labs</span><h3>Junior Software Developer</h3><p>Micro-frontend features for a student learning platform, marketing-cost dashboards in React + Recharts, a Next.js + Wagtail content platform tuned for SSR/SSG, and a long refactor of class components toward something maintainable.</p><div class="glare"></div></div></div>
+          <div class="tl-item"><div class="tl-card tilt"><span class="mono">Jul 2023 — Apr 2025 · Reckonsys Tech Labs</span><h3>Junior Software Developer</h3><p>Built a lead-to-sale marketing-attribution platform for a client end-to-end as the sole developer. Shipped micro-frontend features for a student learning platform, a Next.js + Wagtail content platform tuned for SSR/SSG, and a long refactor of class components toward something maintainable.</p><div class="glare"></div></div></div>
           <div class="tl-item"><div class="tl-card tilt"><span class="mono">Feb 2023 — Jul 2023 · Reckonsys Tech Labs</span><h3>Full-Stack Intern → hired</h3><p>Real tickets in React, TypeScript, Node and MongoDB. The capstone was a realtime Slack clone over WebSockets; the outcome was a full-time offer.</p><div class="glare"></div></div></div>
           <div class="tl-item"><div class="tl-card tilt"><span class="mono">B.E. Electronics &amp; Telecommunication</span><h3>SSGMCE, Shegaon</h3><p>Also: led a four-person team to 2nd runner-up at the Adani Electricity hackathon, ₹50,000 in prize money, and a lasting habit of building things over a weekend.</p><div class="glare"></div></div></div>
         </div>
@@ -353,7 +436,7 @@
         <div class="about__text">
           <h2 class="section__title" data-split style="margin-bottom:32px">About</h2>
           <div data-reveal>
-            <p>I started in electronics and telecommunication, then found out I liked making pixels behave more than making circuits behave. Three years later I've shipped micro-frontends, dashboards, CMS platforms and a page builder, mostly in the Next.js + TypeScript corner of the world.</p>
+            <p>I started in electronics and telecommunication, then found out I liked making pixels behave more than making circuits behave. Three years later I've built an analytics product from scratch and shipped micro-frontends, dashboards, CMS platforms and a page builder, mostly in the Next.js + TypeScript corner of the world.</p>
             <p>What I actually enjoy: taking something slow and inaccessible and quietly turning it into something fast and obvious. Bonus points if a content team stops needing me afterwards.</p>
           </div>
           <div class="facts" data-reveal>
