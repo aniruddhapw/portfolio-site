@@ -136,10 +136,10 @@
       <span class="section__num" data-parallax="0.25" aria-hidden="true">01</span>
       <div class="wrap section__head">
         <h2 class="section__title" data-split>Selected <span class="serif">work</span></h2>
-        <span class="mono">05 things I'm proud of — scroll sideways</span>
+        <span class="mono" data-touch-text="05 things I'm proud of — swipe sideways">05 things I'm proud of — scroll sideways</span>
       </div>
       <div class="work__pin" id="workPin">
-        <div class="work__track" id="workTrack">
+        <div class="work__track" id="workTrack" data-carousel>
           <!-- Reckonsys client work: client names intentionally omitted. -->
           <article class="project tilt" data-cursor-label="view">
             <div class="project__visual">
@@ -311,7 +311,7 @@
           </div>
         </div>
 
-        <div class="pillars">
+        <div class="pillars" data-carousel>
           <div class="pillar tilt" data-parallax-local="-0.06"><div class="pillar__n">01</div><span class="mono">The problem</span><p>A Pages Router site on Bootstrap/SCSS, cross-browser bugs, slow loads, and every content edit routed through engineering.</p><div class="glare"></div></div>
           <div class="pillar tilt" data-parallax-local="0.04"><div class="pillar__n">02</div><span class="mono">The approach</span><p>Route-by-route migration to App Router behind flags, a Tailwind component layer, and pre-commit ESLint plus build validation so regressions stopped shipping.</p><div class="glare"></div></div>
           <div class="pillar tilt" data-parallax-local="-0.1"><div class="pillar__n">03</div><span class="mono">The result</span><p>Scores in the 80–95 band, a responsive cross-browser UI, and a page builder content teams drive themselves.</p><div class="glare"></div></div>
@@ -365,7 +365,7 @@
               <li>Funnel, revenue and campaign-performance dashboards in React + Recharts</li>
             </ul>
           </div>
-          <div class="pillars">
+          <div class="pillars" data-carousel>
             <div class="pillar tilt" data-parallax-local="-0.06"><div class="pillar__n">01</div><span class="mono">The problem</span><p>Ad platforms grade themselves on engagement. The business needed revenue per source — and a way to settle the sales-vs-marketing argument with data.</p><div class="glare"></div></div>
             <div class="pillar tilt" data-parallax-local="0.04"><div class="pillar__n">02</div><span class="mono">The build</span><p>Every layer, from the first commit: the funnel model, CRM and ad-source ingestion, attribution matching, and the product UI on top.</p><div class="glare"></div></div>
             <div class="pillar tilt" data-parallax-local="-0.1"><div class="pillar__n">03</div><span class="mono">The dashboards</span><p>Spend against leads against approvals, true revenue per lead source, goals per channel, and team views sales managers actually open.</p><div class="glare"></div></div>
@@ -380,7 +380,7 @@
       <div class="wrap">
         <div class="section__head">
           <h2 class="section__title" data-split>The <span class="serif">stack</span></h2>
-          <span class="mono">Chips run from the cursor — try it</span>
+          <span class="mono" data-touch-text="Tap the chips — they scatter">Chips run from the cursor — try it</span>
         </div>
         <div class="stack__grid">
           <div class="skills" data-reveal>
@@ -431,7 +431,7 @@
       <div class="wrap about__grid">
         <div class="portrait" data-reveal data-cursor-label="poke">
           <canvas id="monogram" aria-label="Particle monogram of the initials AW that scatters around the cursor"></canvas>
-          <span class="mono">3,000 particles · they come back</span>
+          <span class="mono" data-touch-text="Tap to scatter · they come back">3,000 particles · they come back</span>
         </div>
         <div class="about__text">
           <h2 class="section__title" data-split style="margin-bottom:32px">About</h2>
@@ -485,15 +485,15 @@
         </div>
         <div class="lab__grid">
           <article class="exp" data-reveal>
-            <div class="exp__canvas"><canvas data-fx="constellation"></canvas><span class="exp__hint">MOVE CURSOR</span></div>
+            <div class="exp__canvas"><canvas data-fx="constellation"></canvas><span class="exp__hint" data-touch-text="TOUCH &amp; HOLD">MOVE CURSOR</span></div>
             <div class="exp__body"><span class="mono">Canvas 2D</span><h3>The constellation field</h3><p>~2KB of JS, no library — it links neighbours and reaches for your cursor.</p></div>
           </article>
           <article class="exp" data-reveal>
-            <div class="exp__canvas"><canvas data-fx="terrain"></canvas><span class="exp__hint">MOVE CURSOR</span></div>
+            <div class="exp__canvas"><canvas data-fx="terrain"></canvas><span class="exp__hint" data-touch-text="SWIPE SIDEWAYS">MOVE CURSOR</span></div>
             <div class="exp__body"><span class="mono">3D · Hand-rolled projection</span><h3>Wireframe terrain</h3><p>A noise heightmap pushed through a perspective divide by hand. No WebGL, no library — just a 2D context and some math.</p></div>
           </article>
           <article class="exp" data-reveal>
-            <div class="exp__canvas"><canvas data-fx="ink"></canvas><span class="exp__hint">DRAW</span></div>
+            <div class="exp__canvas"><canvas data-fx="ink"></canvas><span class="exp__hint" data-touch-text="DRAW SIDEWAYS">DRAW</span></div>
             <div class="exp__body"><span class="mono">Canvas · Particles</span><h3>Ink trail</h3><p>Drag across it. Each stroke sheds particles that drift on a curl-noise current and fade out.</p></div>
           </article>
         </div>

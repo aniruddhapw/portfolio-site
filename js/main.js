@@ -14,6 +14,9 @@ const TAU = Math.PI * 2;
 const root = document.documentElement;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
+const touch = !finePointer && matchMedia('(pointer: coarse)').matches;
+// phones on data-saver or with little memory get the lightest version of every effect
+const lowPower = touch && (navigator.connection?.saveData || (navigator.deviceMemory || 8) <= 4);
 const isMobile = () => innerWidth <= 900;
 const gsap = window.gsap;
 const ScrollTrigger = window.ScrollTrigger;
@@ -21,7 +24,7 @@ const hasGSAP = !!(gsap && ScrollTrigger);
 if (hasGSAP) gsap.registerPlugin(ScrollTrigger);
 
 const state = {
-  time: 0, scrollY: scrollY, vel: 0,
+  time: 0, frame: 0, scrollY: scrollY, vel: 0,
   px: innerWidth / 2, py: innerHeight / 2, nx: 0, ny: 0,
   accent: '#9184d9',
 };
@@ -34,6 +37,7 @@ function frame(now) {
   const dt = Math.min((now - lastT) / 1000, 0.05);
   lastT = now;
   state.time += dt * (reduced ? 0.25 : 1);
+  state.frame++;
   state.scrollY = scrollY;
   state.vel = lerp(state.vel, state.scrollY - lastY, 0.15);
   lastY = state.scrollY;
@@ -50,7 +54,7 @@ const io = new IntersectionObserver((entries) => {
 }, { rootMargin: '120px' });
 function observe(el, fx) { fx.visible = false; el.__fx = fx; io.observe(el); return fx; }
 
-function fitCanvas(canvas, maxDpr = 2) {
+function fitCanvas(canvas, maxDpr = touch ? 1.5 : 2) {
   const r = canvas.getBoundingClientRect();
   const dpr = Math.min(devicePixelRatio || 1, maxDpr);
   const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
@@ -64,7 +68,9 @@ function hexToRgb(hex) {
   const n = parseInt(hex.replace('#', ''), 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
-const rgba = (hex, a) => { const [r, g, b] = hexToRgb(hex); return `rgba(${r},${g},${b},${a})`; };
+const setText = (el, text) => { if (el.textContent !== text) el.textContent = text; };
+const rgbCache = new Map();
+const rgba = (hex, a) => { let c = rgbCache.get(hex); if (!c) { c = hexToRgb(hex).join(','); rgbCache.set(hex, c); } return `rgba(${c},${a.toFixed(3)})`; };
 
 /* ---------- Perlin noise (improved), used by the canvases ---------- */
 const perm = new Uint8Array(512);
@@ -148,6 +154,18 @@ addEventListener('pointermove', (e) => {
     dot.style.transform = `translate3d(${state.px}px, ${state.py}px, 0)`;
   });
 })();
+
+if (touch) $$('[data-touch-text]').forEach((el) => { el.textContent = el.dataset.touchText; });
+
+
+// Touch has no hover: a tap or press stands in for the cursor, then lets go.
+function pokeOnTouch(target, set, clear, holdMs = 650) {
+  if (!touch) return;
+  let timer;
+  target.addEventListener('pointerdown', (e) => { set(e); clearTimeout(timer); });
+  target.addEventListener('pointerup', () => { timer = setTimeout(clear, holdMs); });
+  target.addEventListener('pointercancel', () => { timer = setTimeout(clear, holdMs); });
+}
 
 /* ==========================================================================
    Toast, clipboard, clock
@@ -364,7 +382,7 @@ function setupScrollFX() {
     gsap.fromTo(el, { y: 320 * f }, { y: -320 * f, ease: 'none', scrollTrigger: { trigger: el.parentElement, start: 'top bottom', end: 'bottom top', scrub: true } });
   });
 
-  $$('[data-parallax-local]').forEach((el) => {
+  if (!isMobile()) $$('[data-parallax-local]').forEach((el) => {
     const f = parseFloat(el.dataset.parallaxLocal);
     gsap.fromTo(el, { y: -900 * f }, { y: 900 * f, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } });
   });
@@ -559,7 +577,7 @@ async function initGL() {
   }
   THREE.ColorManagement.enabled = false;
   renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
-  const PR = Math.min(devicePixelRatio || 1, 1.6);
+  const PR = Math.min(devicePixelRatio || 1, touch ? (lowPower ? 1 : 1.35) : 1.6);
   renderer.setPixelRatio(PR);
   renderer.setClearColor(0x000000, 0);
 
@@ -574,7 +592,7 @@ async function initGL() {
   const mobile = isMobile();
 
   /* --- star field --- */
-  const COUNT = mobile ? 900 : 2000;
+  const COUNT = lowPower ? 450 : mobile ? 700 : 2000;
   const pos = new Float32Array(COUNT * 3), size = new Float32Array(COUNT), seed = new Float32Array(COUNT), col = new Float32Array(COUNT * 3);
   const palette = ['#e9e9ed', '#e9e9ed', '#b5abfc', '#9184d9', '#7fd1c1'].map((h) => hexToRgb(h).map((v) => v / 255));
   for (let i = 0; i < COUNT; i++) {
@@ -610,7 +628,7 @@ async function initGL() {
       uColA: { value: new THREE.Color('#2b3070') }, uColB: { value: new THREE.Color(state.accent) }, uColC: { value: new THREE.Color('#7fd1c1') },
     },
   });
-  const blob = new THREE.Mesh(new THREE.IcosahedronGeometry(1, mobile ? 28 : 56), blobMat);
+  const blob = new THREE.Mesh(new THREE.IcosahedronGeometry(1, lowPower ? 18 : mobile ? 26 : 56), blobMat);
   core.add(blob);
 
   const glowTex = (() => {
@@ -641,7 +659,7 @@ async function initGL() {
     const g = c.getContext('2d'); g.fillStyle = '#fff'; g.beginPath(); g.arc(16, 16, 14, 0, TAU); g.fill();
     return new THREE.CanvasTexture(c);
   })();
-  const DUST = 320;
+  const DUST = mobile ? 160 : 320;
   const dustPos = new Float32Array(DUST * 3);
   for (let i = 0; i < DUST; i++) {
     const a = Math.random() * TAU, r = 2.15 + (Math.random() - 0.5) * 0.35;
@@ -689,10 +707,13 @@ async function initGL() {
   const contactAnchor = $('[data-core-anchor]');
   const intro = { s: reduced ? 1 : 0, tags: reduced ? 1 : 0 };
   const v3 = new THREE.Vector3();
-  let amp = 0.26;
+  let amp = 0.26, glFrame = 0, sized = false;
 
   function resize() {
-    cw = canvas.clientWidth || innerWidth; ch = canvas.clientHeight || innerHeight;
+    const nw = canvas.clientWidth || innerWidth, nh = canvas.clientHeight || innerHeight;
+    // phones fire resizes as the URL bar slides; only rebuild the drawing buffer for real changes
+    if (touch && sized && nw === cw && Math.abs(nh - ch) < 160) return;
+    cw = nw; ch = nh; sized = true;
     renderer.setSize(cw, ch, false);
     camera.aspect = cw / ch;
     camera.updateProjectionMatrix();
@@ -770,7 +791,9 @@ async function initGL() {
     camera.lookAt(0, 0, 0);
 
     const useContact = place();
-    renderer.render(scene, camera);
+    // On phones, once the core is off-screen only the star field is left: draw it at 30fps.
+    glFrame++;
+    if (!touch || core.visible || Math.abs(state.vel) > 2 || glFrame % 2 === 0) renderer.render(scene, camera);
     updateTags(useContact);
   });
 
@@ -817,6 +840,33 @@ function setupWorkPin() {
     });
   });
 }
+
+
+/* ==========================================================================
+   Mobile carousels: dot indicator that follows the swipe
+   ========================================================================== */
+(function carousels() {
+  $$('[data-carousel]').forEach((track) => {
+    const items = [...track.children];
+    const dots = document.createElement('div');
+    dots.className = 'dots'; dots.setAttribute('aria-hidden', 'true');
+    dots.innerHTML = items.map(() => '<i></i>').join('');
+    track.after(dots);
+    const marks = [...dots.children];
+    let current = -1;
+    const update = () => {
+      if (track.scrollWidth <= track.clientWidth + 4) return;
+      const left = track.scrollLeft, w = items[1] ? items[1].offsetLeft - items[0].offsetLeft : track.clientWidth;
+      const i = clamp(Math.round(left / w), 0, items.length - 1);
+      if (i === current) return;
+      current = i;
+      marks.forEach((m, k) => m.classList.toggle('is-on', k === i));
+    };
+    track.addEventListener('scroll', update, { passive: true });
+    addEventListener('resize', update);
+    marks[0].classList.add('is-on'); current = 0;
+  });
+})();
 
 (function chat() {
   const log = $('#chatLog'), typing = $('#typing');
@@ -902,10 +952,12 @@ function setupWorkPin() {
       retarget();
     }
     for (const k in kpi) kpi[k] = lerp(kpi[k], target[k] * ease(grow), 0.08);
-    kpiEls.spend.textContent = `${kpi.spend.toFixed(1)}K`;
-    kpiEls.leads.textContent = Math.round(kpi.leads).toLocaleString('en-US');
-    kpiEls.deals.textContent = Math.round(kpi.deals).toLocaleString('en-US');
-    kpiEls.roas.textContent = `${kpi.roas.toFixed(1)}×`;
+    if (!(state.frame & 3)) {
+    setText(kpiEls.spend, `${kpi.spend.toFixed(1)}K`);
+    setText(kpiEls.leads, Math.round(kpi.leads).toLocaleString('en-US'));
+    setText(kpiEls.deals, Math.round(kpi.deals).toLocaleString('en-US'));
+    setText(kpiEls.roas, `${kpi.roas.toFixed(1)}×`);
+    }
 
     const padL = 10, padR = 10, padT = 14, padB = 20, cw = W - padL - padR, chh = H - padT - padB, step = cw / N;
     ctx.clearRect(0, 0, W, H);
@@ -961,7 +1013,7 @@ function setupWorkPin() {
   const reset = () => {
     ({ ctx, w: W, h: H } = fitCanvas(canvas));
     ctx.fillStyle = '#0f1019'; ctx.fillRect(0, 0, W, H);
-    parts = Array.from({ length: 420 }, () => ({ x: Math.random() * W, y: Math.random() * H, c: cols[(Math.random() * cols.length) | 0], w: 0.6 + Math.random() * 2.4 }));
+    parts = Array.from({ length: touch ? 240 : 420 }, () => ({ x: Math.random() * W, y: Math.random() * H, c: cols[(Math.random() * cols.length) | 0], w: 0.6 + Math.random() * 2.4 }));
     age = 0; seedZ += 3.7;
   };
   new ResizeObserver(reset).observe(canvas);
@@ -1049,6 +1101,7 @@ function setupWorkPin() {
   let mx = -9999, my = -9999;
   field.addEventListener('pointermove', (e) => { const r = field.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
   field.addEventListener('pointerleave', () => { mx = my = -9999; });
+  pokeOnTouch(field, (e) => { const r = field.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; }, () => { mx = my = -9999; }, 500);
   const fx = observe(field, {});
   addLoop(() => {
     if (!fx.visible) return;
@@ -1122,6 +1175,7 @@ async function monogram() {
   canvas.parentElement.addEventListener('pointermove', (e) => { const r = canvas.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
   canvas.parentElement.addEventListener('pointerleave', () => { mx = my = -9999; });
   canvas.parentElement.addEventListener('click', () => { burst = 1; });
+  pokeOnTouch(canvas.parentElement, (e) => { const r = canvas.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; }, () => { mx = my = -9999; });
   addLoop((dt, time) => {
     if (!fx.visible) return;
     ctx.clearRect(0, 0, W, H);
@@ -1155,6 +1209,8 @@ function labConstellation() {
   let mx = -9999, my = -9999;
   canvas.addEventListener('pointermove', (e) => { const r = canvas.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
   canvas.addEventListener('pointerleave', () => { mx = my = -9999; });
+  pokeOnTouch(canvas, (e) => { const r = canvas.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; }, () => { mx = my = -9999; }, 900);
+  canvas.style.touchAction = 'pan-y';
   addLoop(() => {
     if (!fx.visible || !ctx) return;
     ctx.clearRect(0, 0, W, H);
@@ -1187,7 +1243,8 @@ function labTerrain() {
   new ResizeObserver(() => { ({ ctx, w: W, h: H } = fitCanvas(canvas)); }).observe(canvas);
   let mx = 0, camX = 0;
   canvas.addEventListener('pointermove', (e) => { const r = canvas.getBoundingClientRect(); mx = ((e.clientX - r.left) / r.width) * 2 - 1; });
-  const COLS = 34, ROWS = 26, SP = 1;
+  canvas.style.touchAction = 'pan-y'; // horizontal swipes steer, vertical ones still scroll the page
+  const COLS = touch ? 24 : 34, ROWS = touch ? 18 : 26, SP = 1;
   addLoop((dt, time) => {
     if (!fx.visible || !ctx) return;
     camX = lerp(camX, mx * 6, 0.05);
@@ -1244,9 +1301,10 @@ function labInk() {
   const parts = [];
   let px = null, py = null, down = false, idle = 0;
   const cols = ['#9184d9', '#7fd1c1', '#d97f9a', '#e0a45e'];
-  const emit = (x, y, vx, vy) => {
-    for (let k = 0; k < 4; k++) parts.push({ x, y, vx: vx * 0.3 + (Math.random() - 0.5), vy: vy * 0.3 + (Math.random() - 0.5), life: 1, c: cols[(Math.random() * cols.length) | 0] });
-    if (parts.length > 1400) parts.splice(0, parts.length - 1400);
+  const emit = (x, y, vx, vy, n = 4) => {
+    for (let k = 0; k < n; k++) parts.push({ x, y, vx: vx * 0.3 + (Math.random() - 0.5), vy: vy * 0.3 + (Math.random() - 0.5), life: 1, c: cols[(Math.random() * cols.length) | 0] });
+    const cap = touch ? 600 : 1400;
+    if (parts.length > cap) parts.splice(0, parts.length - cap);
   };
   const local = (e) => { const r = canvas.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
   canvas.addEventListener('pointerdown', (e) => { down = true; [px, py] = local(e); canvas.setPointerCapture(e.pointerId); });
@@ -1256,7 +1314,7 @@ function labInk() {
     if ((down || finePointer) && px !== null) { emit(x, y, x - px, y - py); idle = 0; }
     px = x; py = y;
   });
-  canvas.style.touchAction = 'none';
+  canvas.style.touchAction = 'pan-y'; // sideways strokes draw, vertical swipes still scroll
   const curl = (x, y, t) => {
     const e = 0.01, s = 0.006;
     const n1 = noise3(x * s, (y + e) * s, t), n2 = noise3(x * s, (y - e) * s, t);
@@ -1268,7 +1326,7 @@ function labInk() {
     idle += dt;
     if (idle > 1.5) { // ghost pen draws a lissajous when nobody's playing
       const gx = W / 2 + Math.sin(time * 1.3) * W * 0.32, gy = H / 2 + Math.sin(time * 1.9 + 1) * H * 0.3;
-      emit(gx, gy, Math.cos(time * 1.3) * 4, Math.cos(time * 1.9 + 1) * 4);
+      emit(gx, gy, Math.cos(time * 1.3) * 4, Math.cos(time * 1.9 + 1) * 4, touch ? 2 : 4);
     }
     ctx.globalCompositeOperation = 'source-over';
     ctx.fillStyle = 'rgba(15,16,25,0.09)'; ctx.fillRect(0, 0, W, H);
@@ -1371,7 +1429,7 @@ function heroIntroSetup() {
 async function boot() {
   const loader = $('#loader'), num = $('#loadNum'), bar = $('#loadBar');
   const playIntro = heroIntroSetup();
-  const minTime = reduced ? 0 : 1500;
+  const minTime = reduced ? 0 : touch ? 900 : 1500;
   const t0 = performance.now();
   let shown = 0, done = false;
   const counter = () => {
